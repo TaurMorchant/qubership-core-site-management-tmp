@@ -1,0 +1,27 @@
+microservice:
+  name: site-management
+  namespace: core-dev
+
+synchronizer:
+  interval: 120s
+
+tenant:
+  default:
+    domain:
+      zone: ""
+
+mail:
+  fromEmail: "no-reply@openshift.sdntest.qubership"
+  server:
+    host: "iplanet.qubership.org"
+    port: "25"
+    user: "admin"
+    password: "admin"
+  message:
+    content: "From: %s\r\nTo: %s\r\nSubject: Tenant %s has been updated\r\n\r\n%s"
+
+  log.level: info
+
+consul-source-config:
+  acl:
+    disabled: true

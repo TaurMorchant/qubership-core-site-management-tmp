@@ -1,0 +1,1127 @@
+definitions:
+  domain.CustomService:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      url:
+        type: string
+    type: object
+  domain.Metadata:
+    properties:
+      annotations:
+        additionalProperties:
+          type: string
+        type: object
+      name:
+        type: string
+      namespace:
+        type: string
+    type: object
+  domain.Realm:
+    properties:
+      routes:
+        items:
+          type: string
+        type: array
+      tenant:
+        type: string
+    type: object
+  domain.Realms:
+    properties:
+      cloud-common:
+        items:
+          type: string
+        type: array
+      tenants:
+        items:
+          $ref: '#/definitions/domain.Realm'
+        type: array
+    type: object
+  domain.Route:
+    properties:
+      metadata:
+        $ref: '#/definitions/domain.Metadata'
+      spec:
+        $ref: '#/definitions/domain.RouteSpec'
+    type: object
+  domain.RoutePort:
+    properties:
+      targetPort:
+        type: integer
+    type: object
+  domain.RouteSpec:
+    properties:
+      host:
+        type: string
+      path:
+        type: string
+      port:
+        $ref: '#/definitions/domain.RoutePort'
+      to:
+        $ref: '#/definitions/domain.Target'
+    type: object
+  domain.Service:
+    properties:
+      metadata:
+        $ref: '#/definitions/domain.Metadata'
+      spec:
+        $ref: '#/definitions/domain.ServiceSpec'
+    type: object
+  domain.ServiceSpec:
+    properties:
+      clusterIP:
+        type: string
+      ports:
+        items:
+          $ref: '#/definitions/site-management_site-management-service_paasMediationClient_domain.Port'
+        type: array
+      selector:
+        additionalProperties:
+          type: string
+        type: object
+      type:
+        type: string
+    type: object
+  domain.Services:
+    additionalProperties:
+      items:
+        type: string
+      type: array
+    type: object
+  domain.Sites:
+    additionalProperties:
+      $ref: '#/definitions/domain.Services'
+    type: object
+  domain.Target:
+    properties:
+      name:
+        type: string
+    type: object
+  domain.TenantData:
+    properties:
+      ignoreMissing:
+        type: boolean
+      name:
+        type: string
+      protocol:
+        type: string
+      routes:
+        items:
+          $ref: '#/definitions/domain.CustomService'
+        type: array
+      site:
+        type: string
+      tenantId:
+        type: string
+    type: object
+  domain.TenantDns:
+    properties:
+      active:
+        type: boolean
+      domainName:
+        type: string
+      namespaces:
+        items:
+          type: string
+        type: array
+      serviceName:
+        type: string
+      sites:
+        $ref: '#/definitions/domain.Sites'
+      tenantAdmin:
+        type: string
+      tenantId:
+        type: string
+      tenantName:
+        type: string
+    type: object
+  domain.ValidationInfo:
+    properties:
+      reason:
+        type: string
+      valid:
+        type: boolean
+    type: object
+  domain.ValidationResult:
+    additionalProperties:
+      additionalProperties:
+        $ref: '#/definitions/domain.ValidationInfo'
+      type: object
+    type: object
+  site-management_site-management-service_paasMediationClient_domain.Port:
+    properties:
+      name:
+        type: string
+      nodePort:
+        type: integer
+      port:
+        type: integer
+      protocol:
+        type: string
+      targetPort:
+        type: integer
+    type: object
+  tm.Admin:
+    properties:
+      login:
+        type: string
+    type: object
+  tm.Tenant:
+    properties:
+      admin:
+        $ref: '#/definitions/tm.Admin'
+      domainName:
+        type: string
+      externalId:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+      objectId:
+        type: string
+      serviceName:
+        type: string
+      status:
+        type: string
+    type: object
+info:
+  description: Site Management is a microservice that processes cloud project external
+    routes.
+  title: Site Management API
+  version: "2.0"
+paths:
+  /api/v1/activate/create-os-tenant-alias-routes/perform/{tenantId}:
+    post:
+      description: Create Tenant Route
+      operationId: CreateTenantRoute
+      parameters:
+      - description: tenantId
+        in: path
+        name: tenantId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        default:
+          description: ""
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create Tenant Route
+      tags:
+      - api-v1
+  /api/v1/annotated-routes:
+    get:
+      description: Get Requesting annotated routes
+      operationId: ListAnnotatedRoutes
+      parameters:
+      - description: tenantId
+        in: query
+        name: tenantId
+        required: true
+        type: string
+      - default: default
+        description: async
+        in: query
+        name: async
+        type: string
+      - default: http
+        description: site
+        in: query
+        name: site
+        type: string
+      - default: "false"
+        description: ignoreMissing
+        in: query
+        name: ignoreMissing
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.CustomService'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Requesting annotated routes
+      tags:
+      - api-v1
+  /api/v1/annotated-routes-bulk:
+    post:
+      description: Get Requesting annotated routes bulk
+      operationId: ListAnnotatedRoutesBulk
+      parameters:
+      - description: TenantData
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/domain.TenantData'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.TenantData'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Requesting annotated routes bulk
+      tags:
+      - api-v1
+  /api/v1/identity-provider-route:
+    get:
+      description: Get Requesting annotated routes
+      operationId: GetIdpRoute
+      parameters:
+      - description: tenantId
+        in: query
+        name: tenantId
+        required: true
+        type: string
+      - default: http
+        description: async
+        in: query
+        name: async
+        type: string
+      - default: default
+        description: site
+        in: query
+        name: site
+        type: string
+      - default: "false"
+        description: ignoreMissing
+        in: query
+        name: ignoreMissing
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.CustomService'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Requesting annotated routes
+      tags:
+      - api-v1
+  /api/v1/openshift-routes:
+    get:
+      description: Get Requesting annotated routes bulk
+      operationId: ListOpenShiftRoutes
+      parameters:
+      - collectionFormat: multi
+        description: namespaces
+        in: query
+        items:
+          type: string
+        name: collection
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Route'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Requesting openshift routes
+      tags:
+      - api-v1
+  /api/v1/public-services:
+    get:
+      description: Get Requesting public services
+      operationId: ListPublicServices
+      parameters:
+      - collectionFormat: csv
+        description: namespaces
+        in: query
+        items:
+          type: string
+        name: collection
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Service'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Requesting public services
+      tags:
+      - api-v1
+  /api/v1/reset-caches:
+    post:
+      description: Post ResetCaches By External Request
+      operationId: ResetCaches
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: ResetCaches By External Request
+      tags:
+      - api-v1
+  /api/v1/routes:
+    get:
+      description: Get Domain Tenant Dns
+      operationId: GetDomainTenantDns
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.TenantDns'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Domain Tenant Dns
+      tags:
+      - api-v1
+    post:
+      description: Upsert
+      operationId: Upsert
+      parameters:
+      - description: TenantDns
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TenantDns'
+      - default: "true"
+        description: async
+        in: query
+        name: async
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.TenantDns'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Upsert
+      tags:
+      - api-v1
+    put:
+      description: Upsert Update
+      operationId: UpsertUpdate
+      parameters:
+      - description: TenantDns
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TenantDns'
+      - default: "true"
+        description: async
+        in: query
+        name: async
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.TenantDns'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Upsert Update
+      tags:
+      - api-v1
+  /api/v1/routes/{tenantId}:
+    delete:
+      description: Delete Routes
+      operationId: DeleteRoutes
+      parameters:
+      - description: tenantId
+        in: path
+        name: tenantId
+        required: true
+        type: string
+      - default: "true"
+        description: async
+        in: query
+        name: async
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Routes
+      tags:
+      - api-v1
+    get:
+      description: Get Tenant Dns
+      operationId: GetTenantDns
+      parameters:
+      - description: tenantId
+        in: path
+        name: tenantId
+        required: true
+        type: string
+      - description: site
+        in: query
+        name: site
+        type: string
+      - default: "true"
+        description: mergeGeneral
+        in: query
+        name: mergeGeneral
+        type: string
+      - description: generateDefaultSiteIfEmpty
+        in: query
+        name: generateDefaultSiteIfEmpty
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.TenantDns'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Tenant Dns
+      tags:
+      - api-v1
+  /api/v1/routes/{tenantId}/activate:
+    post:
+      description: Activate Tenant
+      operationId: ActivateTenant
+      parameters:
+      - description: tenantId
+        in: path
+        name: tenantId
+        required: true
+        type: string
+      - default: "true"
+        description: async
+        in: query
+        name: async
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        default:
+          description: ""
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Activate Tenant
+      tags:
+      - api-v1
+  /api/v1/routes/{tenantId}/deactivate:
+    post:
+      description: Deactivate Tenant
+      operationId: DeactivateTenant
+      parameters:
+      - description: tenantId
+        in: path
+        name: tenantId
+        required: true
+        type: string
+      - default: "true"
+        description: async
+        in: query
+        name: async
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Deactivate Tenant
+      tags:
+      - api-v1
+  /api/v1/routes/{tenantId}/restore-tenant-alias:
+    post:
+      description: Restore Tenant Alias
+      operationId: RestoreTenantAlias
+      parameters:
+      - description: tenantId
+        in: path
+        name: tenantId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Restore Tenant Alias
+      tags:
+      - api-v1
+  /api/v1/routes/{tenantId}/site:
+    get:
+      description: Get Site
+      operationId: GetSite
+      parameters:
+      - description: tenantId
+        in: path
+        name: tenantId
+        type: string
+      - description: mergeGeneral
+        in: query
+        name: mergeGeneral
+        type: string
+      - description: generateDefaultSiteIfEmpty
+        in: query
+        name: generateDefaultSiteIfEmpty
+        type: string
+      - description: url
+        in: header
+        name: url
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Site
+      tags:
+      - api-v1
+  /api/v1/routes/sync-idp:
+    post:
+      description: Sync IDP
+      operationId: SyncIDP
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Sync IDP
+      tags:
+      - api-v1
+  /api/v1/search:
+    get:
+      description: Search
+      operationId: Search
+      parameters:
+      - description: host
+        in: query
+        name: host
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.TenantDns'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Search
+      tags:
+      - api-v1
+  /api/v1/sync:
+    post:
+      description: Post Sync By External Request
+      operationId: Sync
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Sync By External Request
+      tags:
+      - api-v1
+  /api/v1/tenants:
+    post:
+      description: Register Tenant
+      operationId: RegisterTenant
+      parameters:
+      - description: tenant
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/tm.Tenant'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Register Tenant
+      tags:
+      - api-v1
+  /api/v1/tenants/{tenantId}:
+    delete:
+      description: Delete Tenant
+      operationId: DeleteTenant
+      parameters:
+      - description: tenantId
+        in: path
+        name: tenantId
+        required: true
+        type: string
+      - description: protocol
+        in: query
+        name: protocol
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        default:
+          description: ""
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Tenant
+      tags:
+      - api-v1
+  /api/v1/tenants/current/service/name:
+    get:
+      description: Get Service Name
+      operationId: GetServiceName
+      parameters:
+      - description: Tenant
+        in: header
+        name: Connection
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Service Name
+      tags:
+      - api-v1
+  /api/v1/tenants/current/services:
+    get:
+      description: Get tenant current services
+      operationId: GetTenantCurrentServices
+      parameters:
+      - description: X-Forwarded-Proto
+        in: header
+        name: X-Forwarded-Proto
+        type: string
+      - description: Tenant
+        in: header
+        name: Tenant
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.CustomService'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Get tenant current services
+      tags:
+      - api-v1
+  /api/v1/trusted-hosts:
+    get:
+      description: Get Realms
+      operationId: GetRealms
+      parameters:
+      - description: showAllTenants
+        in: query
+        name: showAllTenants
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Realms'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Realms
+      tags:
+      - api-v1
+  /api/v1/trusted-hosts/{tenantId}:
+    get:
+      description: Get Realm
+      operationId: GetRealm
+      parameters:
+      - description: tenantId
+        in: path
+        name: tenantId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Realm'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Realm
+      tags:
+      - api-v1
+  /api/v1/validate:
+    post:
+      description: Validate Scheme
+      operationId: Validate
+      parameters:
+      - description: TenantDns
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TenantDns'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ValidationResult'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Validate Scheme
+      tags:
+      - api-v1
+produces:
+- application/json
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+tags:
+- description: Apis related to V1
+  name: api-v1
