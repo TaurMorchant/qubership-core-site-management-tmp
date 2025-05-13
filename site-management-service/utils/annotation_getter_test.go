@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -68,7 +69,7 @@ func TestGroupAnnotationGetter_Get(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			getter := NewBaseAnnotationGetter(tt.groups...)
+			getter := NewBaseAnnotationMapper(tt.groups...)
 			val, ok := getter.Get(tt.annotations, tt.key)
 
 			if val != tt.expectedVal {
@@ -78,6 +79,55 @@ func TestGroupAnnotationGetter_Get(t *testing.T) {
 			if ok != tt.expectedOk {
 				t.Errorf("expected ok %v, got %v", tt.expectedOk, ok)
 			}
+		})
+	}
+}
+
+func TestGroupAnnotationMapper_Set(t *testing.T) {
+	tests := []struct {
+		name            string
+		initAnnotations map[string]string
+		expAnnotations  map[string]string
+		groups          []string
+	}{
+		{
+			name: "key exists in first group",
+			initAnnotations: map[string]string{
+				"key1": "value1",
+				"key2": "value2",
+			},
+			expAnnotations: map[string]string{
+				"group1/key1": "value1",
+				"group2/key1": "value1",
+				"group1/key2": "value2",
+				"group2/key2": "value2",
+			},
+			groups: []string{"group1", "group2"},
+		},
+		{
+			name:            "empty annotations",
+			initAnnotations: map[string]string{},
+			expAnnotations:  map[string]string{},
+			groups:          []string{"group1", "group2"},
+		},
+		{
+			name: "empty groups",
+			initAnnotations: map[string]string{
+				"key1": "value1",
+			},
+			expAnnotations: map[string]string{},
+			groups:         []string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			getter := NewBaseAnnotationMapper(tt.groups...)
+			expAnn := getter.Set(tt.initAnnotations)
+			if !reflect.DeepEqual(expAnn, tt.expAnnotations) {
+				t.Errorf("expected annotations %v, got %v", tt.expAnnotations, expAnn)
+			}
+
 		})
 	}
 }

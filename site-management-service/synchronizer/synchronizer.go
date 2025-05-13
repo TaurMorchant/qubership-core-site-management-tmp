@@ -755,7 +755,7 @@ func (s *Synchronizer) generateShoppingRoute(ctx context.Context, domainName, te
 // Returns services marked by annotation key "qubership.cloud/tenant.service.alias.prefix" as public
 func (s *Synchronizer) GetPublicServices(ctx context.Context, namespaces []string) (*[]mdomain.Service, error) {
 	filter := func(service *mdomain.Service) bool {
-		_, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(service.Metadata.Annotations, "tenant.service.alias.prefix")
+		_, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(service.Metadata.Annotations, "tenant.service.alias.prefix")
 		return ok
 	}
 
@@ -1548,24 +1548,24 @@ func hostBelongsToActiveTenant(_ context.Context, host string, allSettings *[]do
 }
 
 func IsVirtual(r mdomain.Metadata) bool {
-	value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Annotations, "tenant.service.type")
+	value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Annotations, "tenant.service.type")
 	return ok && value == "virtual"
 }
 
 func RouteIsGeneral(r *mdomain.Route) bool {
-	value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.tenant.id")
+	value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Metadata.Annotations, "tenant.service.tenant.id")
 	return ok && value == "GENERAL"
 }
 
 func RouteHasTenantId(tenantId string) func(r *mdomain.Route) bool {
 	return func(r *mdomain.Route) bool {
-		value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.tenant.id")
+		value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Metadata.Annotations, "tenant.service.tenant.id")
 		return ok && value == tenantId
 	}
 }
 
 func IsRouteManageable(r *mdomain.Route) bool {
-	value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.tenant.id")
+	value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Metadata.Annotations, "tenant.service.tenant.id")
 	return ok && strings.Compare(value, "GENERAL") != 0
 }
 

@@ -11,7 +11,7 @@ import (
 func init() {
 	serviceloader.Register(1, &idp.DummyRetryableClient{})
 	serviceloader.Register(1, &security.DummyToken{})
-	serviceloader.Register(1, utils.NewBaseAnnotationGetter("qubership.cloud"))
+	serviceloader.Register(1, utils.NewBaseAnnotationMapper("qubership.cloud"))
 }
 
 //go:generate go run github.com/swaggo/swag/cmd/swag init --generalInfo /controller/api.go --parseDependency --parseGoList=false --parseDepth 2

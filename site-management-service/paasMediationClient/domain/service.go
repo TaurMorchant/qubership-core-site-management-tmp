@@ -26,7 +26,7 @@ type Port struct {
 }
 
 func (s Service) GetId() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(s.Metadata.Annotations, "tenant.service.id"); ok {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(s.Metadata.Annotations, "tenant.service.id"); ok {
 		return value
 	} else {
 		return ""
@@ -34,7 +34,7 @@ func (s Service) GetId() string {
 }
 
 func (s Service) GetShowName() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(s.Metadata.Annotations, "tenant.service.show.name"); ok {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(s.Metadata.Annotations, "tenant.service.show.name"); ok {
 		return value
 	} else {
 		return ""
@@ -42,7 +42,7 @@ func (s Service) GetShowName() string {
 }
 
 func (s Service) GetDescription() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(s.Metadata.Annotations, "tenant.service.show.description"); ok {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(s.Metadata.Annotations, "tenant.service.show.description"); ok {
 		return value
 	} else {
 		return ""
@@ -50,7 +50,7 @@ func (s Service) GetDescription() string {
 }
 
 func (s Service) GetSuffix() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(s.Metadata.Annotations, "tenant.service.url.suffix"); ok {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(s.Metadata.Annotations, "tenant.service.url.suffix"); ok {
 		return value
 	} else {
 		return ""
@@ -58,7 +58,7 @@ func (s Service) GetSuffix() string {
 }
 
 func (s Service) GetPrefix() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(s.Metadata.Annotations, "tenant.service.alias.prefix"); ok {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(s.Metadata.Annotations, "tenant.service.alias.prefix"); ok {
 		return value
 	} else {
 		return ""

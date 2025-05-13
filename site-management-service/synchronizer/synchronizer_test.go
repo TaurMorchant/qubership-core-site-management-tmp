@@ -157,7 +157,7 @@ var (
 )
 
 func init() {
-	serviceloader.Register(1, utils.NewBaseAnnotationGetter("qubership.cloud"))
+	serviceloader.Register(1, utils.NewBaseAnnotationMapper("qubership.cloud"))
 }
 
 func TestFindServicesInNamespace(t *testing.T) {

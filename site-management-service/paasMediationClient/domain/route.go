@@ -29,10 +29,10 @@ type RoutePort struct {
 }
 
 func (r Route) GetPriority() int {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.tenant.id"); ok && value == "GENERAL" {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Metadata.Annotations, "tenant.service.tenant.id"); ok && value == "GENERAL" {
 		return -1
 	} else {
-		if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.order"); ok {
+		if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Metadata.Annotations, "tenant.service.order"); ok {
 			if result, err := strconv.Atoi(value); err != nil {
 				return result
 			}
@@ -42,7 +42,7 @@ func (r Route) GetPriority() int {
 }
 
 func (r Route) GetServiceDescription() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.show.description"); ok {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Metadata.Annotations, "tenant.service.show.description"); ok {
 		return value
 	} else {
 		return ""
@@ -50,7 +50,7 @@ func (r Route) GetServiceDescription() string {
 }
 
 func (r Route) GetServiceName() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.show.name"); ok {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Metadata.Annotations, "tenant.service.show.name"); ok {
 		return value
 	} else {
 		return ""
@@ -58,7 +58,7 @@ func (r Route) GetServiceName() string {
 }
 
 func (r Route) GetServiceSuffix() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.url.suffix"); ok {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Metadata.Annotations, "tenant.service.url.suffix"); ok {
 		return value
 	} else {
 		return ""
@@ -66,7 +66,7 @@ func (r Route) GetServiceSuffix() string {
 }
 
 func (r Route) GetServiceId(defaultValue string) string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.id"); ok {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Metadata.Annotations, "tenant.service.id"); ok {
 		return value
 	} else {
 		return defaultValue
@@ -74,7 +74,7 @@ func (r Route) GetServiceId(defaultValue string) string {
 }
 
 func (r Route) GetTenantId() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.tenant.id"); ok {
+	if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(r.Metadata.Annotations, "tenant.service.tenant.id"); ok {
 		return value
 	} else {
 		return ""
