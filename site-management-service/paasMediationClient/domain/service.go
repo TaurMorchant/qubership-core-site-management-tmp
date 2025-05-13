@@ -1,9 +1,6 @@
 package domain
 
-import (
-	"github.com/netcracker/qubership-core-lib-go/v3/serviceloader"
-	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/utils"
-)
+import "github.com/netcracker/qubership-core-site-management/site-management-service/v2/utils"
 
 type Service struct {
 	Metadata Metadata    `json:"metadata"`
@@ -26,41 +23,21 @@ type Port struct {
 }
 
 func (s Service) GetId() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(s.Metadata.Annotations, "tenant.service.id"); ok {
-		return value
-	} else {
-		return ""
-	}
+	return utils.FindAnnotation(s.Metadata.Annotations, "tenant.service.id")
 }
 
 func (s Service) GetShowName() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(s.Metadata.Annotations, "tenant.service.show.name"); ok {
-		return value
-	} else {
-		return ""
-	}
+	return utils.FindAnnotation(s.Metadata.Annotations, "tenant.service.show.name")
 }
 
 func (s Service) GetDescription() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(s.Metadata.Annotations, "tenant.service.show.description"); ok {
-		return value
-	} else {
-		return ""
-	}
+	return utils.FindAnnotation(s.Metadata.Annotations, "tenant.service.show.description")
 }
 
 func (s Service) GetSuffix() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(s.Metadata.Annotations, "tenant.service.url.suffix"); ok {
-		return value
-	} else {
-		return ""
-	}
+	return utils.FindAnnotation(s.Metadata.Annotations, "tenant.service.url.suffix")
 }
 
 func (s Service) GetPrefix() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(s.Metadata.Annotations, "tenant.service.alias.prefix"); ok {
-		return value
-	} else {
-		return ""
-	}
+	return utils.FindAnnotation(s.Metadata.Annotations, "tenant.service.alias.prefix")
 }

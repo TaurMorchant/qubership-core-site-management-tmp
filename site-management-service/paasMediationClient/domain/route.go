@@ -2,6 +2,7 @@ package domain
 
 import (
 	"github.com/netcracker/qubership-core-lib-go/v3/serviceloader"
+	utilsCore "github.com/netcracker/qubership-core-lib-go/v3/utils"
 	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/utils"
 	"reflect"
 	"strconv"
@@ -29,10 +30,11 @@ type RoutePort struct {
 }
 
 func (r Route) GetPriority() int {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.tenant.id"); ok && value == "GENERAL" {
+	mapper := serviceloader.MustLoad[utilsCore.AnnotationMapper]()
+	if value, ok := mapper.Find(r.Metadata.Annotations, "tenant.service.tenant.id"); ok && value == "GENERAL" {
 		return -1
 	} else {
-		if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.order"); ok {
+		if value, ok := mapper.Find(r.Metadata.Annotations, "tenant.service.order"); ok {
 			if result, err := strconv.Atoi(value); err != nil {
 				return result
 			}
@@ -42,31 +44,19 @@ func (r Route) GetPriority() int {
 }
 
 func (r Route) GetServiceDescription() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.show.description"); ok {
-		return value
-	} else {
-		return ""
-	}
+	return utils.FindAnnotation(r.Metadata.Annotations, "tenant.service.show.description")
 }
 
 func (r Route) GetServiceName() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.show.name"); ok {
-		return value
-	} else {
-		return ""
-	}
+	return utils.FindAnnotation(r.Metadata.Annotations, "tenant.service.show.name")
 }
 
 func (r Route) GetServiceSuffix() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.url.suffix"); ok {
-		return value
-	} else {
-		return ""
-	}
+	return utils.FindAnnotation(r.Metadata.Annotations, "tenant.service.url.suffix")
 }
 
 func (r Route) GetServiceId(defaultValue string) string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.id"); ok {
+	if value, ok := serviceloader.MustLoad[utilsCore.AnnotationMapper]().Find(r.Metadata.Annotations, "tenant.service.id"); ok {
 		return value
 	} else {
 		return defaultValue
@@ -74,11 +64,7 @@ func (r Route) GetServiceId(defaultValue string) string {
 }
 
 func (r Route) GetTenantId() string {
-	if value, ok := serviceloader.MustLoad[utils.AnnotationGetter]().Get(r.Metadata.Annotations, "tenant.service.tenant.id"); ok {
-		return value
-	} else {
-		return ""
-	}
+	return utils.FindAnnotation(r.Metadata.Annotations, "tenant.service.tenant.id")
 }
 
 func (r Route) String() string {

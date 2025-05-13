@@ -27,10 +27,12 @@ import (
 	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/migration"
 	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/paasMediationClient"
 	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/synchronizer"
+	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/utils"
 	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
+	"sync/atomic"
 	"syscall"
 	"time"
 )
@@ -47,9 +49,6 @@ var (
 )
 
 func RunService() {
-	// TODO: Database migrations. Maybe https://github.com/golang-migrate/migrate
-	// TODO: swagger
-
 	basePropertySources := configloader.BasePropertySources(configloader.YamlPropertySourceParams{ConfigFilePath: "application.yaml"})
 	configloader.InitWithSourcesArray(basePropertySources)
 	consulPS := consul.NewLoggingPropertySource()
@@ -180,15 +179,20 @@ func RunService() {
 		return ctx.Status(http.StatusOK).SendString(docs.SwaggerInfo.ReadDoc()) // run `go generate` for local work
 	})
 
-	registerShutdownHook(func() {
+	exitCode := atomic.Int32{}
+	utils.RegisterShutdownHook(func(code int) {
+		exitCode.Store(int32(code))
+
 		if err := app.Shutdown(); err != nil {
 			logger.ErrorC(ctx, "Site-management error during server shutdown: %v", err)
 		}
+
 		globalCancel()
-		//genericDao.Close()
 	})
 
 	server.StartServer(app, "http.server.bind")
+
+	os.Exit(int(exitCode.Load()))
 }
 
 func registerShutdownHook(hook func()) {

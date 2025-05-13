@@ -3,7 +3,10 @@ package domain
 import (
 	"fmt"
 	"github.com/netcracker/qubership-core-lib-go/v3/logging"
+	"github.com/netcracker/qubership-core-lib-go/v3/serviceloader"
+	"github.com/netcracker/qubership-core-lib-go/v3/utils"
 	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/paasMediationClient/domain"
+	utils2 "github.com/netcracker/qubership-core-site-management/site-management-service/v2/utils"
 	"hash/crc32"
 	"net/url"
 	"sort"
@@ -127,11 +130,13 @@ func (a SortableAddressList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a SortableAddressList) Less(i, j int) bool { return a[i] < a[j] }
 
 func (s ServiceRegistration) ToService() *domain.Service {
-	annotations := map[string]string{
-		"qubership.cloud/tenant.service.alias.prefix": s.VirtualService,
-		"qubership.cloud/tenant.service.show.name":    strings.Title(strings.ReplaceAll(s.VirtualService, "-", " ")),
-		"qubership.cloud/tenant.service.type":         "virtual",
+	annotationsBase := map[string]string{
+		"tenant.service.alias.prefix": s.VirtualService,
+		"tenant.service.show.name":    strings.Title(strings.ReplaceAll(s.VirtualService, "-", " ")),
+		"tenant.service.type":         "virtual",
 	}
+	annotations := serviceloader.MustLoad[utils.AnnotationMapper]().AddPrefix(annotationsBase)
+
 	for k, v := range s.VirtualServiceAnnotations {
 		annotations[k] = v
 	}
@@ -169,12 +174,12 @@ func (s ServiceRegistration) ToRoute(platformHost, namespace string) *domain.Rou
 	return &domain.Route{
 		Metadata: domain.Metadata{
 			Name: s.VirtualService,
-			Annotations: map[string]string{
-				"qubership.cloud/tenant.service.tenant.id": "GENERAL",
-				"qubership.cloud/tenant.service.show.name": strings.Title(strings.ReplaceAll(s.VirtualService, "-", " ")),
-				"qubership.cloud/tenant.service.id":        s.VirtualService,
-				"qubership.cloud/tenant.service.type":      "virtual",
-			},
+			Annotations: serviceloader.MustLoad[utils.AnnotationMapper]().AddPrefix(map[string]string{
+				"tenant.service.tenant.id": "GENERAL",
+				"tenant.service.show.name": strings.Title(strings.ReplaceAll(s.VirtualService, "-", " ")),
+				"tenant.service.id":        s.VirtualService,
+				"tenant.service.type":      "virtual",
+			}),
 		},
 		Spec: domain.RouteSpec{
 			Host:    host.Host(),
@@ -240,10 +245,11 @@ func (t TenantDns) AppendToRoutes(routes *[]domain.Route) *[]domain.Route {
 
 func (t TenantDns) ToRoute(serviceName string, address Address) *domain.Route {
 	// TODO: check that requested serviceName and address exists in this struct
+
 	return &domain.Route{
 		Metadata: domain.Metadata{
 			Name:        t.GenerateUniqueNameForRoute(serviceName, address),
-			Annotations: map[string]string{"qubership.cloud/tenant.service.tenant.id": t.TenantId},
+			Annotations: serviceloader.MustLoad[utils.AnnotationMapper]().AddPrefix(map[string]string{"tenant.service.tenant.id": t.TenantId}),
 		},
 		Spec: domain.RouteSpec{
 			Host:    address.Host(),
@@ -274,7 +280,7 @@ func (t *TenantDns) FlattenAddressesToHosts() {
 func FromRoutes(routes *[]domain.Route) *[]TenantDns {
 	tmp := make(map[string]TenantDns)
 	for _, route := range *routes {
-		tenantId := route.Metadata.Annotations["qubership.cloud/tenant.service.tenant.id"]
+		tenantId := utils2.FindAnnotation(route.Metadata.Annotations, "tenant.service.tenant.id")
 		tr, ok := tmp[tenantId]
 		if !ok {
 			tr = TenantDns{Sites: Sites{}}
@@ -298,7 +304,8 @@ func FromRoutes(routes *[]domain.Route) *[]TenantDns {
 		}
 
 		services[serviceName] = append(addresses,
-			ConcatAddress(route.Spec.Host, route.Metadata.Annotations["qubership.cloud/tenant.service.url.suffix"]))
+			ConcatAddress(route.Spec.Host, utils2.FindAnnotation(route.Metadata.Annotations, "tenant.service.url.suffix")),
+		)
 	}
 
 	// transfer map to list
