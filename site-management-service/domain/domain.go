@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"github.com/netcracker/qubership-core-lib-go/v3/logging"
 	"github.com/netcracker/qubership-core-lib-go/v3/serviceloader"
+	"github.com/netcracker/qubership-core-lib-go/v3/utils"
 	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/paasMediationClient/domain"
-	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/utils"
+	utils2 "github.com/netcracker/qubership-core-site-management/site-management-service/v2/utils"
 	"hash/crc32"
 	"net/url"
 	"sort"
@@ -134,7 +135,7 @@ func (s ServiceRegistration) ToService() *domain.Service {
 		"tenant.service.show.name":    strings.Title(strings.ReplaceAll(s.VirtualService, "-", " ")),
 		"tenant.service.type":         "virtual",
 	}
-	annotations := serviceloader.MustLoad[utils.AnnotationMapper]().Set(annotationsBase)
+	annotations := serviceloader.MustLoad[utils.AnnotationMapper]().AddPrefix(annotationsBase)
 
 	for k, v := range s.VirtualServiceAnnotations {
 		annotations[k] = v
@@ -173,7 +174,7 @@ func (s ServiceRegistration) ToRoute(platformHost, namespace string) *domain.Rou
 	return &domain.Route{
 		Metadata: domain.Metadata{
 			Name: s.VirtualService,
-			Annotations: serviceloader.MustLoad[utils.AnnotationMapper]().Set(map[string]string{
+			Annotations: serviceloader.MustLoad[utils.AnnotationMapper]().AddPrefix(map[string]string{
 				"tenant.service.tenant.id": "GENERAL",
 				"tenant.service.show.name": strings.Title(strings.ReplaceAll(s.VirtualService, "-", " ")),
 				"tenant.service.id":        s.VirtualService,
@@ -248,7 +249,7 @@ func (t TenantDns) ToRoute(serviceName string, address Address) *domain.Route {
 	return &domain.Route{
 		Metadata: domain.Metadata{
 			Name:        t.GenerateUniqueNameForRoute(serviceName, address),
-			Annotations: serviceloader.MustLoad[utils.AnnotationMapper]().Set(map[string]string{"tenant.service.tenant.id": t.TenantId}),
+			Annotations: serviceloader.MustLoad[utils.AnnotationMapper]().AddPrefix(map[string]string{"tenant.service.tenant.id": t.TenantId}),
 		},
 		Spec: domain.RouteSpec{
 			Host:    address.Host(),
@@ -279,10 +280,7 @@ func (t *TenantDns) FlattenAddressesToHosts() {
 func FromRoutes(routes *[]domain.Route) *[]TenantDns {
 	tmp := make(map[string]TenantDns)
 	for _, route := range *routes {
-		tenantId := ""
-		if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(route.Metadata.Annotations, "tenant.service.tenant.id"); ok {
-			tenantId = value
-		}
+		tenantId := utils2.FindAnnotation(route.Metadata.Annotations, "tenant.service.tenant.id")
 		tr, ok := tmp[tenantId]
 		if !ok {
 			tr = TenantDns{Sites: Sites{}}
@@ -305,12 +303,8 @@ func FromRoutes(routes *[]domain.Route) *[]TenantDns {
 			addresses = AddressList{}
 		}
 
-		url := ""
-		if value, ok := serviceloader.MustLoad[utils.AnnotationMapper]().Get(route.Metadata.Annotations, "tenant.service.url.suffix"); ok {
-			url = value
-		}
 		services[serviceName] = append(addresses,
-			ConcatAddress(route.Spec.Host, url),
+			ConcatAddress(route.Spec.Host, utils2.FindAnnotation(route.Metadata.Annotations, "tenant.service.url.suffix")),
 		)
 	}
 
