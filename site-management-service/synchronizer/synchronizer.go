@@ -1563,7 +1563,8 @@ func RouteHasTenantId(tenantId string) func(r *mdomain.Route) bool {
 }
 
 func IsRouteManageable(r *mdomain.Route) bool {
-	return utils.FindAnnotation(r.Metadata.Annotations, "tenant.service.tenant.id") != "GENERAL"
+	annotation := utils.FindAnnotation(r.Metadata.Annotations, "tenant.service.tenant.id")
+	return annotation != "" && annotation != "GENERAL"
 }
 
 func (s *Synchronizer) buildCustomServicesFromRoutes(ctx context.Context, routes *[]mdomain.Route, protocol string, namespaces []string) (*[]mdomain.CustomService, error) {
