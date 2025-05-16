@@ -1,3 +1,9 @@
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?metric=coverage&project=Netcracker_qubership-core-site-management)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-site-management)
+[![duplicated_lines_density](https://sonarcloud.io/api/project_badges/measure?metric=duplicated_lines_density&project=Netcracker_qubership-core-site-management)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-site-management)
+[![vulnerabilities](https://sonarcloud.io/api/project_badges/measure?metric=vulnerabilities&project=Netcracker_qubership-core-site-management)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-site-management)
+[![bugs](https://sonarcloud.io/api/project_badges/measure?metric=bugs&project=Netcracker_qubership-core-site-management)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-site-management)
+[![code_smells](https://sonarcloud.io/api/project_badges/measure?metric=code_smells&project=Netcracker_qubership-core-site-management)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-site-management)
+
 This documentation describes Site Management REST API. It contains: 
 
 * [Overview](#overview)
