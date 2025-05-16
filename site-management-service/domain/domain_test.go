@@ -3,14 +3,14 @@ package domain
 import (
 	"fmt"
 	"github.com/netcracker/qubership-core-lib-go/v3/serviceloader"
+	"github.com/netcracker/qubership-core-lib-go/v3/utils"
 	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/paasMediationClient/domain"
-	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/utils"
 	"reflect"
 	"testing"
 )
 
 func init() {
-	serviceloader.Register(1, utils.NewBaseAnnotationMapper("qubership.cloud"))
+	serviceloader.Register(1, utils.NewResourceGroupAnnotationsMapper("qubership.cloud"))
 }
 
 func TestFromRoutes(t *testing.T) {
