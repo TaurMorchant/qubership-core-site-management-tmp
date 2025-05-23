@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/docker/go-connections/nat"
 	gerrors "github.com/go-errors/errors"
 	dbaasbase "github.com/netcracker/qubership-core-lib-go-dbaas-base-client/v3"
 	"github.com/netcracker/qubership-core-lib-go-dbaas-base-client/v3/model"
@@ -14,9 +13,8 @@ import (
 	"github.com/netcracker/qubership-core-lib-go/v3/configloader"
 	"github.com/netcracker/qubership-core-lib-go/v3/security"
 	"github.com/netcracker/qubership-core-lib-go/v3/serviceloader"
+	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/testharness"
 	"github.com/stretchr/testify/assert"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/wait"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/migrate"
 	"net/http"
@@ -25,17 +23,6 @@ import (
 	"strings"
 	"testing"
 )
-
-const (
-	postgresPort            = "5432"
-	testContainerDbPassword = "123qwerty"
-	testContainerDbUser     = "postgres"
-	testContainerDb         = "demo"
-
-	m2mKeycloakTokenEndpoint = "auth/realms/cloud-common/protocol/openid-connect/token"
-)
-
-var mockServer *httptest.Server
 
 func TestMain(m *testing.M) {
 	serviceloader.Register(1, &security.DummyToken{})
@@ -54,7 +41,7 @@ func testMigration(t *testing.T, fail bool) {
 	ctx := context.Background()
 	configloader.Init(configloader.EnvPropertySource())
 
-	pgContainer := prepareTestContainer(t, ctx)
+	pgContainer := testharness.PreparePostgres(t, ctx)
 	addr, err := pgContainer.Endpoint(ctx, "")
 	if err != nil {
 		t.Error(err)
@@ -63,7 +50,7 @@ func testMigration(t *testing.T, fail bool) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.URL.Path, "/databases") {
 			w.WriteHeader(http.StatusOK)
-			jsonString := pgDbaasResponseHandler(addr, testContainerDbPassword)
+			jsonString := pgDbaasResponseHandler(addr, testharness.PostgresPassword)
 			w.Write(jsonString)
 		} else {
 			http.NotFoundHandler().ServeHTTP(w, r)
@@ -151,42 +138,12 @@ func testMigration(t *testing.T, fail bool) {
 	}
 }
 
-func prepareTestContainer(t *testing.T, ctx context.Context) testcontainers.Container {
-	dockerAddr := configloader.GetKoanf().String("test.docker.url")
-	if err := os.Setenv("DOCKER_HOST", dockerAddr); err != nil {
-		log.PanicC(ctx, "Failed to set env DOCKER_HOST=%s\n %v", dockerAddr, err)
-	}
-	env := map[string]string{
-		"POSTGRES_USER":     testContainerDbUser,
-		"POSTGRES_PASSWORD": testContainerDbPassword,
-		"POSTGRES_DB":       testContainerDb,
-	}
-	port, _ := nat.NewPort("tcp", postgresPort)
-	req := testcontainers.ContainerRequest{
-		Image:        "postgres:11.1",
-		ExposedPorts: []string{port.Port()},
-		SkipReaper:   true,
-		Env:          env,
-		WaitingFor: wait.ForAll(
-			wait.ForListeningPort(port),
-		),
-	}
-	pgContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
-	if err != nil {
-		t.Error(err)
-	}
-	return pgContainer
-}
-
 func pgDbaasResponseHandler(address, password string) []byte {
-	url := fmt.Sprintf("postgresql://%s/%s", address, testContainerDb)
+	url := fmt.Sprintf("postgresql://%s/%s", address, testharness.PostgresDatabase)
 	connectionProperties := map[string]interface{}{
 		"password": password,
 		"url":      url,
-		"username": testContainerDbUser,
+		"username": testharness.PostgresUsername,
 		"role":     "admin",
 	}
 	dbResponse := model.LogicalDb{
@@ -198,16 +155,12 @@ func pgDbaasResponseHandler(address, password string) []byte {
 }
 
 func prepareTestEnvironment(serverUrl string) {
-	os.Setenv("policy.file.name", "../testdata/test-policies.conf")
-	os.Setenv("identity.provider.url", serverUrl)
 	os.Setenv("dbaas.agent", serverUrl)
 	os.Setenv("microservice.namespace", "site-management-namespace")
 	os.Setenv("microservice.name", "site-management")
 }
 
 func cleanTestEnvironment() {
-	os.Unsetenv("policy.file.name")
-	os.Unsetenv("identity.provider.url")
 	os.Unsetenv("dbaas.agent")
 }
 

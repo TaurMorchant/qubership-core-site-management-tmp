@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/docker/go-connections/nat"
 	dbaasbase "github.com/netcracker/qubership-core-lib-go-dbaas-base-client/v3"
 	"github.com/netcracker/qubership-core-lib-go-dbaas-base-client/v3/model"
 	pgdbaas "github.com/netcracker/qubership-core-lib-go-dbaas-postgres-client/v4"
@@ -13,26 +12,17 @@ import (
 	"github.com/netcracker/qubership-core-lib-go/v3/serviceloader"
 	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/domain"
 	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/migration"
+	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/testharness"
 	"github.com/netcracker/qubership-core-site-management/site-management-service/v2/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/wait"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"reflect"
 	"strings"
 	"testing"
-)
-
-const (
-	postgresPort            = "5432"
-	testContainerDbPassword = "123qwerty"
-	testContainerDbUser     = "postgres"
-	testContainerDb         = "demo"
-
-	m2mKeycloakTokenEndpoint = "auth/realms/cloud-common/protocol/openid-connect/token"
 )
 
 func TestMain(m *testing.M) {
@@ -54,7 +44,7 @@ func TestSuite(t *testing.T) {
 func (suite *DaoTestSuit) SetupSuite() {
 	suite.ctx = context.Background()
 	configloader.Init(configloader.EnvPropertySource())
-	suite.pgContainer = prepareTestContainer(suite.T(), suite.ctx)
+	suite.pgContainer = testharness.PreparePostgres(suite.T(), suite.ctx)
 	addr, err := suite.pgContainer.Endpoint(suite.ctx, "")
 	if err != nil {
 		suite.T().Error(err)
@@ -63,7 +53,7 @@ func (suite *DaoTestSuit) SetupSuite() {
 	suite.server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.URL.Path, "/databases") {
 			w.WriteHeader(http.StatusOK)
-			jsonString := pgDbaasResponseHandler(addr, testContainerDbPassword)
+			jsonString := pgDbaasResponseHandler(addr, testharness.PostgresPassword)
 			w.Write(jsonString)
 		} else {
 			http.NotFoundHandler().ServeHTTP(w, r)
@@ -287,42 +277,12 @@ func (suite *DaoTestSuit) createPgClientForTest() pgdbaas.PgClient {
 	return pgClient
 }
 
-func prepareTestContainer(t *testing.T, ctx context.Context) testcontainers.Container {
-	dockerAddr := configloader.GetKoanf().String("test.docker.url")
-	if err := os.Setenv("DOCKER_HOST", dockerAddr); err != nil {
-		logger.PanicC(ctx, "Failed to set env DOCKER_HOST=%s\n %v", dockerAddr, err)
-	}
-	env := map[string]string{
-		"POSTGRES_USER":     testContainerDbUser,
-		"POSTGRES_PASSWORD": testContainerDbPassword,
-		"POSTGRES_DB":       testContainerDb,
-	}
-	port, _ := nat.NewPort("tcp", postgresPort)
-	req := testcontainers.ContainerRequest{
-		Image:        "postgres:11.1",
-		ExposedPorts: []string{port.Port()},
-		SkipReaper:   true,
-		Env:          env,
-		WaitingFor: wait.ForAll(
-			wait.ForListeningPort(port),
-		),
-	}
-	pgContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
-	if err != nil {
-		t.Error(err)
-	}
-	return pgContainer
-}
-
 func pgDbaasResponseHandler(address, password string) []byte {
-	url := fmt.Sprintf("postgresql://%s/%s", address, testContainerDb)
+	url := fmt.Sprintf("postgresql://%s/%s", address, testharness.PostgresDatabase)
 	connectionProperties := map[string]interface{}{
 		"password": password,
 		"url":      url,
-		"username": testContainerDbUser,
+		"username": testharness.PostgresUsername,
 		"role":     "admin",
 	}
 	dbResponse := model.LogicalDb{
@@ -334,16 +294,12 @@ func pgDbaasResponseHandler(address, password string) []byte {
 }
 
 func prepareTestEnvironment(serverUrl string) {
-	os.Setenv("policy.file.name", "../testdata/test-policies.conf")
-	os.Setenv("identity.provider.url", serverUrl)
 	os.Setenv("dbaas.agent", serverUrl)
 	os.Setenv("microservice.namespace", "site-management-namespace")
 	os.Setenv("microservice.name", "site-management")
 }
 
 func cleanTestEnvironment() {
-	os.Unsetenv("policy.file.name")
-	os.Unsetenv("identity.provider.url")
 	os.Unsetenv("dbaas.agent")
 }
 
