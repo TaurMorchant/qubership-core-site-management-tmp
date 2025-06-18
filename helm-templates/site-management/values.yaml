@@ -1,0 +1,21 @@
+# ============== DEPLOYMENT VARIABLES ============================
+MONITORING_ENABLED: true
+CLOUD_TOPOLOGY_KEY: kubernetes.io/hostname
+READONLY_CONTAINER_FILE_SYSTEM_ENABLED: false
+IMAGE_REPOSITORY: 'ghcr.io/netcracker/qubership-core-site-management'
+
+# ============== SERVICE VARIABLES ============================
+LOG_LEVEL: "info"
+SERVICE_NAME: 'site-management'
+
+TRACING_ENABLED: false
+TRACING_HOST: 'nc-diagnostic-agent'
+TRACING_SAMPLER_RATELIMITING: 10
+
+VAULT_INTEGRATION: false
+
+TENANT_DEFAULT_DOMAIN_ZONE: ''
+
+K8S_SERVICE_TYPE: 'CLUSTER_IP'
+CONSUL_ENABLED: false
+CONSUL_URL: ''
