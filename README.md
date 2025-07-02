@@ -5,6 +5,8 @@
 [![bugs](https://sonarcloud.io/api/project_badges/measure?metric=bugs&project=Netcracker_qubership-core-site-management)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-site-management)
 [![code_smells](https://sonarcloud.io/api/project_badges/measure?metric=code_smells&project=Netcracker_qubership-core-site-management)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-site-management)
 
+dummy text to trigger build
+
 This documentation describes Site Management REST API. It contains: 
 
 * [Overview](#overview)
