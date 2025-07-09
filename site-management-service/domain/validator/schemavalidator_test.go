@@ -19,7 +19,7 @@ var (
 
 	tenantWithEmptyHost = domain.TenantDns{
 		TenantId:    "tenantWithEmptyHost",
-		TenantAdmin: "admin@qubership.org",
+		TenantAdmin: "admin@example.com",
 		Sites: domain.Sites{
 			centralSite: domain.Services{
 				serviceName: domain.AddressList{
@@ -36,7 +36,7 @@ var (
 
 	tenantWithInvalidHost = domain.TenantDns{
 		TenantId:    "tenantWithInvalidHost",
-		TenantAdmin: "admin@qubership.org",
+		TenantAdmin: "admin@example.com",
 		Sites: domain.Sites{
 			centralSite: domain.Services{
 				serviceName: domain.AddressList{
@@ -56,7 +56,7 @@ var (
 
 	tenantWithDuplicatedHost = domain.TenantDns{
 		TenantId:    "tenantWithDuplicatedHost",
-		TenantAdmin: "admin@qubership.org",
+		TenantAdmin: "admin@example.com",
 		Sites: domain.Sites{
 			centralSite: domain.Services{
 				serviceName: domain.AddressList{
@@ -68,7 +68,7 @@ var (
 
 	tenantWithDuplicatedHostForAnotherService = domain.TenantDns{
 		TenantId:    "tenantWithDuplicatedHostForAnotherService",
-		TenantAdmin: "admin@qubership.org",
+		TenantAdmin: "admin@example.com",
 		Sites: domain.Sites{
 			centralSite: domain.Services{
 				anotherService: domain.AddressList{
@@ -80,7 +80,7 @@ var (
 
 	tenantWithDuplicatedHostsForDifferentServices = domain.TenantDns{
 		TenantId:    "tenantWithDuplicatedHostsForDifferentServices",
-		TenantAdmin: "admin@qubership.org",
+		TenantAdmin: "admin@example.com",
 		Sites: domain.Sites{
 			defaultSite: domain.Services{
 				serviceName: domain.AddressList{
@@ -97,7 +97,7 @@ var (
 
 	tenantWithDuplicatedHostsForSameService = domain.TenantDns{
 		TenantId:    "tenantWithDuplicatedHostsForDifferentServices",
-		TenantAdmin: "admin@qubership.org",
+		TenantAdmin: "admin@example.com",
 		Sites: domain.Sites{
 			defaultSite: domain.Services{
 				serviceName: domain.AddressList{
@@ -114,7 +114,7 @@ var (
 
 	tenant = domain.TenantDns{
 		TenantId:    "tenant",
-		TenantAdmin: "admin@qubership.org",
+		TenantAdmin: "admin@example.com",
 		Sites: domain.Sites{
 			defaultSite: domain.Services{
 				serviceName: domain.AddressList{

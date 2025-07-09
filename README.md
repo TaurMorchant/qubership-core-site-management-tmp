@@ -471,7 +471,7 @@ http://<public-gateway-url>/api/<version>/site-management/routes
 ```
 {
         "tenantId": "3f582ee7-ee9d-4830-9fc5-0c651352db32",
-        "tenantAdmin": "sandbox-4@qubership.org",
+        "tenantAdmin": "admin@example.com",
         "sites": {
             "default": {
                 "csr-frontend": [
@@ -537,7 +537,7 @@ None
 [
     {
         "tenantId": "5732a936-b6b8-4042-a7e7-d111a7e06e46",
-        "tenantAdmin": "sandbox-3@qubership.org",
+        "tenantAdmin": "admin@example.com",
         "sites": {
             "default": {
                 "csr-frontend": [
@@ -555,7 +555,7 @@ None
     },
     {
         "tenantId": "08044102-eb47-4290-aa48-f79c9d8b6193",
-        "tenantAdmin": "test@mail.com",
+        "tenantAdmin": "admin@example.com",
         "sites": {
             "default": {
                 "csr-frontend": [
@@ -600,7 +600,7 @@ http://<public-gateway-url>/api/<version>/site-management/routes/{tenantId}
 ```
 {
     "tenantId": "3f582ee7-ee9d-4830-9fc5-0c651352db32",
-    "tenantAdmin": "sandbox-4@qubership.org",
+    "tenantAdmin": "admin@example.com",
     "sites": {
         "default": {
             "csr-frontend": [
@@ -732,7 +732,7 @@ http://<public-gateway-url>/api/<version>/site-management/search?host={host}
 [
     {
         "tenantId": "b492e060-9e48-4104-b2c4-e0ae472c1a4d",
-        "tenantAdmin": "default_tenant_admin@default.email.com",
+        "tenantAdmin": "admin@example.com",
         "sites": {
             "default": {
                 "domain-resolver-frontend": [
