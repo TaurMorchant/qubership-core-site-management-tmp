@@ -40,7 +40,7 @@ var (
 		Sites: domain.Sites{
 			centralSite: domain.Services{
 				serviceName: domain.AddressList{
-					"5прпр1",
+					"5invalid1",
 				},
 				anotherService: domain.AddressList{
 					"_asd.com",
