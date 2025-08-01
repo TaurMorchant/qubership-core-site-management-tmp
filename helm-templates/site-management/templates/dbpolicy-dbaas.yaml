@@ -1,0 +1,14 @@
+apiVersion: core.qubership.org/v1
+kind: DBaaS
+subKind: DbPolicy
+metadata:
+  name: {{ .Values.SERVICE_NAME }}
+  namespace: {{ .Values.NAMESPACE }}
+  labels:
+    app.kubernetes.io/name: "{{ .Values.SERVICE_NAME }}"
+    app.kubernetes.io/part-of: "{{ .Values.APPLICATION_NAME }}"
+    app.kubernetes.io/processed-by-operator: core-operator
+    deployer.cleanup/allow: "true"
+    deployment.qubership.org/sessionId: "{{ .Values.DEPLOYMENT_SESSION_ID }}"
+spec:
+  disableGlobalPermissions: true

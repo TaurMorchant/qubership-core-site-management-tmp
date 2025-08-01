@@ -1,0 +1,182 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+    name: '{{ .Values.SERVICE_NAME }}'
+    labels:
+        name: '{{ .Values.SERVICE_NAME }}'
+        app.kubernetes.io/name: '{{ .Values.SERVICE_NAME }}'
+        app.kubernetes.io/instance: '{{ cat .Values.SERVICE_NAME "-" .Values.NAMESPACE | nospace | trunc 63 | trimSuffix "-" }}'
+        app.kubernetes.io/version: '{{ .Values.ARTIFACT_DESCRIPTOR_VERSION }}'
+        app.kubernetes.io/component: 'backend'
+        app.kubernetes.io/part-of: 'Cloud-Core'
+        app.kubernetes.io/managed-by: 'saasDeployer'
+        app.kubernetes.io/technology: 'go'
+        deployment.qubership.org/sessionId: '{{ .Values.DEPLOYMENT_SESSION_ID }}'
+    annotations:
+        qubership.cloud/start.stage: '2'
+spec:
+    replicas: {{ .Values.REPLICAS | default 1 }}
+    revisionHistoryLimit: 3
+    strategy:
+    {{- if eq (default "" .Values.DEPLOYMENT_STRATEGY_TYPE) "recreate" }}
+      type: Recreate
+    {{- else if eq (default "" .Values.DEPLOYMENT_STRATEGY_TYPE) "best_effort_controlled_rollout" }}
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 80%
+    {{- else if eq (default "" .Values.DEPLOYMENT_STRATEGY_TYPE) "ramped_slow_rollout" }}
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+    {{- else if eq (default "" .Values.DEPLOYMENT_STRATEGY_TYPE) "custom_rollout" }}
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: {{ .Values.DEPLOYMENT_STRATEGY_MAXSURGE | default "25%" }}
+        maxUnavailable: {{ .Values.DEPLOYMENT_STRATEGY_MAXUNAVAILABLE | default "25%" }}
+    {{- else }}
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+    {{- end }}
+    template:
+        metadata:
+            labels:
+                name: '{{ .Values.SERVICE_NAME }}'
+                app.kubernetes.io/name: '{{ .Values.SERVICE_NAME }}'
+                app.kubernetes.io/instance: '{{ cat .Values.SERVICE_NAME "-" .Values.NAMESPACE | nospace | trunc 63 | trimSuffix "-" }}'
+                app.kubernetes.io/version: '{{ .Values.ARTIFACT_DESCRIPTOR_VERSION }}'
+                app.kubernetes.io/component: 'backend'
+                app.kubernetes.io/part-of: 'Cloud-Core'
+                app.kubernetes.io/managed-by: 'saasDeployer'
+                app.kubernetes.io/technology: 'go'
+        spec:
+            serviceAccountName: '{{ .Values.SERVICE_NAME }}'
+            volumes:
+{{ if and .Values.READONLY_CONTAINER_FILE_SYSTEM_ENABLED (eq .Values.PAAS_PLATFORM "KUBERNETES") }}
+            -   name: sslcerts
+                emptyDir: {}
+            -   name: cacerts
+                emptyDir: {}
+{{ end }}
+            containers:
+            -   name: '{{ .Values.SERVICE_NAME }}'
+                image: '{{ .Values.IMAGE_REPOSITORY }}:{{ .Values.TAG }}'
+                args:
+                    - /app/site-management
+                ports:
+                -   name: web
+                    containerPort: 8080
+                    protocol: TCP
+                -   name: tls
+                    containerPort: 8443
+                    protocol: TCP
+                env:
+                -   name: CLOUD_NAMESPACE
+                    valueFrom:
+                        fieldRef:
+                            fieldPath: metadata.namespace
+                -   name: MICROSERVICE_NAMESPACE
+                    valueFrom:
+                        fieldRef:
+                            fieldPath: metadata.namespace
+                -   name: CONFIG_SERVER
+                    value: http://config-server:8080
+                -   name: IDENTITY_PROVIDER_URL
+                    value: http://identity-provider:8080
+                -   name: DBAAS_AGENT
+                    value: http://dbaas-agent:8080
+                -   name: TENANT_DEFAULT_DOMAIN_ZONE
+                    value: '{{ .Values.TENANT_DEFAULT_DOMAIN_ZONE }}'
+                -   name: TRACING_ENABLED
+                    value: '{{ .Values.TRACING_ENABLED }}'
+                -   name: TRACING_HOST
+                    value: '{{ .Values.TRACING_HOST }}'
+                -   name: TRACING_SAMPLER_RATELIMITING
+                    value: '{{ .Values.TRACING_SAMPLER_RATELIMITING }}'
+                -   name: SERVICE_URL_DEFAULT_PROTO
+                    value: '{{ .Values.CLOUD_PROTOCOL }}'
+                -   name: CLOUD_PUBLIC_HOST
+                    value: '{{ .Values.CLOUD_PUBLIC_HOST }}'
+                -   name: VAULT_INTEGRATION
+                    value: '{{ .Values.VAULT_INTEGRATION }}'
+                -   name: VAULT_ADDR
+                    value: '{{ .Values.VAULT_ADDR }}'
+                -   name: COMPOSITE_PLATFORM
+                    value: '{{ not (empty (.Values.BASELINE_ORIGIN)) }}'
+                -   name: BASELINE_PROJ
+                    value: '{{ .Values.BASELINE_PROJ }}'
+                -   name: LOG_LEVEL
+                    value: '{{ .Values.LOG_LEVEL }}'
+                -   name: CONSUL_ENABLED
+                    value: '{{ .Values.CONSUL_ENABLED }}'
+                {{ if .Values.CONSUL_ENABLED }}
+                -   name: CONSUL_URL
+                    value: '{{ .Values.CONSUL_URL }}'
+                {{ end }}
+                resources:
+                    requests:
+                        cpu: '{{ .Values.CPU_REQUEST }}'
+                        memory: '{{ .Values.MEMORY_LIMIT }}'
+                    limits:
+                        memory: '{{ .Values.MEMORY_LIMIT }}'
+                        cpu: '{{ .Values.CPU_LIMIT }}'
+                securityContext:
+{{ if eq .Values.PAAS_PLATFORM "KUBERNETES" }}
+                    runAsGroup: 10001
+{{ end }}
+                    readOnlyRootFilesystem: {{ and .Values.READONLY_CONTAINER_FILE_SYSTEM_ENABLED (eq .Values.PAAS_PLATFORM "KUBERNETES") }}
+                    runAsNonRoot: true
+                    seccompProfile:
+                        type: RuntimeDefault
+                    allowPrivilegeEscalation: false
+                    capabilities:
+                        drop:
+                          - ALL
+                volumeMounts:
+{{ if and .Values.READONLY_CONTAINER_FILE_SYSTEM_ENABLED (eq .Values.PAAS_PLATFORM "KUBERNETES") }}
+                -   name: sslcerts
+                    mountPath: /etc/ssl/certs
+                -   name: cacerts
+                    mountPath: /usr/local/share/ca-certificates
+{{ end }}
+                livenessProbe:
+                    httpGet:
+                        path: /health
+                        port: web
+                        scheme: HTTP
+                    initialDelaySeconds: 180
+                    timeoutSeconds: 5
+                readinessProbe:
+                    httpGet:
+                        path: /health
+                        port: web
+                        scheme: HTTP
+                    initialDelaySeconds: 1
+                    timeoutSeconds: 5
+                    periodSeconds: 2
+                    failureThreshold: 15
+            topologySpreadConstraints:
+{{- if .Values.CLOUD_TOPOLOGIES }}
+{{- range $v := .Values.CLOUD_TOPOLOGIES }}
+              - topologyKey: {{ $v.topologyKey }}
+                maxSkew: {{ $v.maxSkew | default 1 }}
+                whenUnsatisfiable: {{ $v.whenUnsatisfiable | default "ScheduleAnyway" }}
+                labelSelector:
+                  matchLabels:
+                    name: "{{ $.Values.SERVICE_NAME }}"
+{{- end }}
+{{- else }}
+              - maxSkew: 1
+                topologyKey: "{{ .Values.CLOUD_TOPOLOGY_KEY }}"
+                whenUnsatisfiable: ScheduleAnyway
+                labelSelector:
+                  matchLabels:
+                    name: "{{ .Values.SERVICE_NAME }}"
+{{- end }}
+    selector:
+        matchLabels:
+            name: '{{ .Values.SERVICE_NAME }}'
