@@ -101,10 +101,6 @@ spec:
                     value: '{{ .Values.CLOUD_PROTOCOL }}'
                 -   name: CLOUD_PUBLIC_HOST
                     value: '{{ .Values.CLOUD_PUBLIC_HOST }}'
-                -   name: VAULT_INTEGRATION
-                    value: '{{ .Values.VAULT_INTEGRATION }}'
-                -   name: VAULT_ADDR
-                    value: '{{ .Values.VAULT_ADDR }}'
                 -   name: COMPOSITE_PLATFORM
                     value: '{{ not (empty (.Values.BASELINE_ORIGIN)) }}'
                 -   name: BASELINE_PROJ

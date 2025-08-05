@@ -25,8 +25,6 @@
       "ARTIFACT_DESCRIPTOR_VERSION": "",
       "MONITORING_ENABLED": false,
       "CLOUD_TOPOLOGY_KEY": "kubernetes.io/hostname",
-      "VAULT_INTEGRATION": false,
-      "VAULT_ADDR": "",
       "CLOUD_PUBLIC_HOST": "",
       "TRACING_ENABLED": false,
       "TRACING_HOST": "nc-diagnostic-agent",
@@ -240,15 +238,6 @@
         "kubernetes.io/hostname"
       ]
     },
-    "VAULT_INTEGRATION": {
-      "$id": "#/properties/VAULT_INTEGRATION",
-      "$ref": "#/definitions/booleanOrString",
-      "description": "Is integration with Vault enabled.",
-      "examples": [
-        false
-      ],
-      "title": "The VAULT_INTEGRATION schema"
-    },
     "CLOUD_PUBLIC_HOST": {
       "$id": "#/properties/CLOUD_PUBLIC_HOST",
       "type": "string",
@@ -324,13 +313,6 @@
       "type": "string",
       "title": "The SERVICE_NAME schema",
       "description": "Name of a service.",
-      "internal": true
-    },
-    "VAULT_ADDR": {
-      "$id": "#/properties/VAULT_ADDR",
-      "type": "string",
-      "title": "The VAULT_ADDR schema",
-      "description": "Vault address",
       "internal": true
     },
     "CLOUD_TOPOLOGIES": {
