@@ -19,7 +19,6 @@
       "NAMESPACE": "",
       "SERVICE_NAME": "site-management",
       "REPLICAS": 1,
-      "SSL_SECRET": "defaultsslcertificate",
       "TAG": "",
       "TENANT_DEFAULT_DOMAIN_ZONE": "",
       "ARTIFACT_DESCRIPTOR_VERSION": "",
@@ -185,16 +184,6 @@
       "title": "The CPU_LIMIT schema",
       "internal": true,
       "envSpecific": true
-    },
-    "SSL_SECRET": {
-      "$id": "#/properties/SSL_SECRET",
-      "type": "string",
-      "title": "The SSL_SECRET schema",
-      "description": "SSL secret name.",
-      "examples": [
-        "defaultsslcertificate"
-      ],
-      "internal": true
     },
     "TAG": {
       "$id": "#/properties/TAG",
