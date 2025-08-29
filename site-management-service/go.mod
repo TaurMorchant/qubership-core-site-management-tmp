@@ -3,10 +3,9 @@ module github.com/netcracker/qubership-core-site-management/site-management-serv
 go 1.24.2
 
 require (
-	github.com/docker/go-connections v0.5.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-errors/errors v1.5.1
-	github.com/gofiber/fiber/v2 v2.52.6
+	github.com/gofiber/fiber/v2 v2.52.9
 	github.com/golang/mock v1.6.0
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/mitchellh/hashstructure/v2 v2.0.2
@@ -46,6 +45,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/docker v28.0.1+incompatible // indirect
+	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/ebitengine/purego v0.8.2 // indirect
 	github.com/fatih/color v1.18.0 // indirect
