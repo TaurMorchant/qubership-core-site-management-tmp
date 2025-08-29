@@ -3,7 +3,6 @@ module github.com/netcracker/qubership-core-site-management/site-management-serv
 go 1.24.2
 
 require (
-	github.com/docker/go-connections v0.5.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-errors/errors v1.5.1
 	github.com/gofiber/fiber/v2 v2.52.6
@@ -22,7 +21,7 @@ require (
 	github.com/swaggo/swag v1.16.4
 	github.com/testcontainers/testcontainers-go v0.37.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.37.0
-	github.com/uptrace/bun v1.2.11
+	github.com/uptrace/bun v1.2.15
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/valyala/fasthttp v1.61.0
 	sigs.k8s.io/yaml v1.4.0
@@ -46,6 +45,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/docker v28.0.1+incompatible // indirect
+	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/ebitengine/purego v0.8.2 // indirect
 	github.com/fatih/color v1.18.0 // indirect
@@ -145,7 +145,7 @@ require (
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
 	golang.org/x/time v0.9.0 // indirect
 	golang.org/x/tools v0.32.0 // indirect
