@@ -6,6 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"strings"
+	"testing"
+
 	gerrors "github.com/go-errors/errors"
 	dbaasbase "github.com/netcracker/qubership-core-lib-go-dbaas-base-client/v3"
 	"github.com/netcracker/qubership-core-lib-go-dbaas-base-client/v3/model"
@@ -17,11 +23,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/migrate"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"strings"
-	"testing"
 )
 
 func TestMain(m *testing.M) {
@@ -187,7 +188,7 @@ type TestEntity2 struct {
 
 func createTestMigrations(fail bool) *migrate.Migrations {
 	migrations := &migrate.Migrations{}
-	migration0 := migrate.Migration{Name: "00000000000000", Comment: "first_migration", Up: func(ctx context.Context, db *bun.DB) error {
+	migration0 := migrate.Migration{Name: "00000000000000", Comment: "first_migration", Up: func(ctx context.Context, db *bun.DB, template any) error {
 		log.Info("first_migration")
 		err := db.RunInTx(ctx, &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
 			testEntity0 := &TestEntity0{
@@ -209,9 +210,9 @@ func createTestMigrations(fail bool) *migrate.Migrations {
 			return nil
 		})
 		return err
-	}, Down: func(ctx context.Context, db *bun.DB) error { return nil }}
+	}, Down: func(ctx context.Context, db *bun.DB, template any) error { return nil }}
 	migrations.Add(migration0)
-	migration1 := migrate.Migration{Name: "00000000000001", Comment: "second_migration", Up: func(ctx context.Context, db *bun.DB) error {
+	migration1 := migrate.Migration{Name: "00000000000001", Comment: "second_migration", Up: func(ctx context.Context, db *bun.DB, template any) error {
 		log.Info("second_migration")
 		err := db.RunInTx(ctx, &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
 			testEntity1 := &TestEntity1{
@@ -238,9 +239,9 @@ func createTestMigrations(fail bool) *migrate.Migrations {
 			return nil
 		})
 		return err
-	}, Down: func(ctx context.Context, db *bun.DB) error { return nil }}
+	}, Down: func(ctx context.Context, db *bun.DB, template any) error { return nil }}
 	migrations.Add(migration1)
-	migration2 := migrate.Migration{Name: "00000000000002", Comment: "third_migration", Up: func(ctx context.Context, db *bun.DB) error {
+	migration2 := migrate.Migration{Name: "00000000000002", Comment: "third_migration", Up: func(ctx context.Context, db *bun.DB, template any) error {
 		log.Info("third_migration")
 		err := db.RunInTx(ctx, &sql.TxOptions{}, func(ctx context.Context, tx bun.Tx) error {
 			testEntity2 := &TestEntity2{
@@ -264,7 +265,7 @@ func createTestMigrations(fail bool) *migrate.Migrations {
 			return nil
 		})
 		return err
-	}, Down: func(ctx context.Context, db *bun.DB) error { return nil }}
+	}, Down: func(ctx context.Context, db *bun.DB, template any) error { return nil }}
 	migrations.Add(migration2)
 	return migrations
 }
