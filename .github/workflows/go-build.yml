@@ -7,15 +7,9 @@ on:
 
 jobs:
   build:
-    uses: netcracker/qubership-core-infra/.github/workflows/go-build-with-sonar.yaml@v1.0.5
+    uses: taurmorchant/workflows-test/.github/workflows/go-build-with-sonar.yaml@main
     with:
       actor: ${{ github.actor }}
       sonar-project-key: ${{ vars.SONAR_PROJECT_KEY }}
     secrets:
       sonar-token: ${{ secrets.SONAR_TOKEN }}
-
-  docker-build:
-    needs: [build]
-    uses: netcracker/qubership-core-infra/.github/workflows/docker-build.yaml@v1.0.5
-    with:
-      dry-run: false
