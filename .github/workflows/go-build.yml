@@ -1,0 +1,14 @@
+name: Go build
+
+on:
+  push:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build-go-service:
+    uses: taurmorchant/workflows-test/.github/workflows/build-go-service.yaml@main
+    with:
+      sonar-project-key: ${{ vars.SONAR_PROJECT_KEY }}
+    secrets:
+      sonar-token: ${{ secrets.SONAR_TOKEN }}
