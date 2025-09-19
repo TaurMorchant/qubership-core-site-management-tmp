@@ -9,6 +9,7 @@ jobs:
   build-go-service:
     uses: taurmorchant/workflows-test/.github/workflows/build-go-service.yaml@main
     with:
+      actor: ${{ github.actor }}
       sonar-project-key: ${{ vars.SONAR_PROJECT_KEY }}
     secrets:
       sonar-token: ${{ secrets.SONAR_TOKEN }}
