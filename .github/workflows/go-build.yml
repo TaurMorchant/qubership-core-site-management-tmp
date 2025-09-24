@@ -1,5 +1,11 @@
 name: Go build
 
+run-name: >
+  Build Go Service — ${{ github.event_name }}
+  (${{ github.head_ref || github.ref_name }})
+  ${{ github.event_name == 'push' && format('— {0}', github.event.head_commit.message) || '' }}
+  ${{ github.event_name == 'pull_request' && format('— {0}', github.event.pull_request.title) || '' }}
+
 on:
   push:
   pull_request:
